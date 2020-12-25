@@ -8,8 +8,7 @@ Authors@R:
            email = "blette@live.unc.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: This package implements the methods described in Gilbert et al. (2020): Post-randomization biomarker effect modification in an HIV vaccine clinical trial
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
