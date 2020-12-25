@@ -1,3 +1,17 @@
+#' Analyze under NEE assumptions
+#'
+#' Analyze data assuming no early treatment effects
+#'
+#' @param data data frame
+#' @param brange numeric vector
+#' @param design string
+#' @param weights numeric vector
+#' @param contrast string
+#'
+#' @return list
+#' @export
+#'
+#' @examples
 analyze_NEE <- function(data, brange = c(0, 0), design = "full",
                         weights = NULL, contrast = "logRR") {
   ########################################################################
