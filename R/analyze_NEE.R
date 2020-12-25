@@ -36,11 +36,6 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   #    contrast: Contrast function for estimand
   #                Options include "logRR", "Difference", and "VE"
 
-  # Load necessary libraries
-  library(rootSolve)
-  library(numDeriv)
-  library(plyr)
-
   # Contrast function
   h <- function(x, y) {
     func <- log(x) - log(y)
@@ -65,7 +60,7 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   if (tolower(design) == "cc") {
     # estimate probability control has S_star observed: P(R = 1 | Y = 0)
     solve_pi <- function(x) { sum((1 - Y)*(R - x)) }
-    pi_hat <- uniroot(solve_pi, c(0, 1))$root
+    pi_hat <- stats::uniroot(solve_pi, c(0, 1))$root
     W <- 1 / pi_hat*(1 - Y)*R + Y
   }
   if (!is.null(weights)) {
@@ -81,16 +76,16 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   # Estimate identifiable parameters risk_z, p(0, 0), p(1, 0), and p(1, 1)
   # risk_0 = P(Y(0) = 1 | Y^tau(0) = Y^tau(1) = 0)
   solve_risk0 <- function(x) { sum((1 - Y_tau)*(1 - Z)*(Y - x)) }
-  risk_0 <- uniroot(solve_risk0, c(0, 1))$root
+  risk_0 <- stats:uniroot(solve_risk0, c(0, 1))$root
 
   # risk_1 = P(Y(1) = 1 | Y^tau(0) = Y^tau(1) = 0)
   solve_risk1 <- function(x) { sum((1 - Y_tau)*Z*(Y - x)) }
-  risk_1 <- uniroot(solve_risk1, c(0, 1))$root
+  risk_1 <- stats:uniroot(solve_risk1, c(0, 1))$root
 
   # p(0, 0) = P(S^tau(1) = S^tau(0) = 0 | Y^tau(0) = Y^tau(1) = 0)
   # Recall Case CB: P(S^tau(0) = 0 | Y^tau(0) = Y^tau(1) = 0) = 1
   solve_p00 <- function(x) { sum((1 - Y_tau)*Z*(1 - S_star - x)*W) }
-  p_00 <- uniroot(solve_p00, c(0, 1))$root
+  p_00 <- stats:uniroot(solve_p00, c(0, 1))$root
   p_10 <- 1 - p_00
   # p(1, 1) = 0 under NEE scenario
 
@@ -98,9 +93,9 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   # risk_z(s1, s0) =
   # P(Y(z) = 1 | S^tau(1) = s1, S^tau(0) = s0, Y^tau(1) = Y^tau(0) = 0)
   solve_risk_1_00 <- function(x) { sum(Z*S_0*(Y - x)*W) }
-  risk_1_00 <- uniroot(solve_risk_1_00, c(0, 1))$root
+  risk_1_00 <- stats:uniroot(solve_risk_1_00, c(0, 1))$root
   solve_risk_1_10 <- function(x) { sum(Z*S_1*(Y-x)*W) }
-  risk_1_10 <- uniroot(solve_risk_1_10, c(0, 1))$root
+  risk_1_10 <- stats:uniroot(solve_risk_1_10, c(0, 1))$root
 
   # Estimate risk_0(0, 0) using SACE method
   # This is the only partially identifiable term under NEE assumptions
@@ -108,14 +103,14 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
     risk_0_10 <- 1 / ( 1 + exp(min(brange))*(1 - x)/x )
     risk_0 - x*p_00 - risk_0_10*p_10
   }
-  risk_0_00_first <- uniroot(solve_risk_0_00_min, c(0, 1))$root
+  risk_0_00_first <- stats:uniroot(solve_risk_0_00_min, c(0, 1))$root
   risk_0_10_first <- (risk_0 - risk_0_00_first*p_00) / p_10
 
   solve_risk_0_00_max <- function(x) {
     risk_0_10 <- 1 / ( 1 + exp(max(brange))*(1 - x)/x )
     risk_0 - x*p_00 - risk_0_10*p_10
   }
-  risk_0_00_second <- uniroot(solve_risk_0_00_max, c(0, 1))$root
+  risk_0_00_second <- stats:uniroot(solve_risk_0_00_max, c(0, 1))$root
   risk_0_10_second <- (risk_0 - risk_0_00_second*p_00) / p_10
 
   # Calculate CEP(1,0) ignorance interval
@@ -162,12 +157,12 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   # Variance estimation
 
   # Source M-estimation helper functions
-  source("compute.R")
-  source("utilities.R")
+  #source("compute.R")
+  #source("utilities.R")
 
   # Source files with estimating equations
-  source("No Early Effects/low_eefun_NEE.R")
-  source("No Early Effects/up_eefun_NEE.R")
+  #source("No Early Effects/low_eefun_NEE.R")
+  #source("No Early Effects/up_eefun_NEE.R")
 
   # Define helper function for Imbens-Manski interval computation
   f_cstar <- function(c, low, up, maxsig) {
@@ -191,7 +186,7 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
 
   # Convert data to wide form
   data$W <- W
-  data_wide <- count(data, c('Y', 'Z', 'Y_tau', 'S_star', 'R', 'W'))
+  data_wide <- plyr::count(data, c('Y', 'Z', 'Y_tau', 'S_star', 'R', 'W'))
   data_wide$Group <- 1:nrow(data_wide)
 
   # Calculate variance estimate for the lower bound of the ignorance
@@ -246,22 +241,23 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   # compute Imbens-Manski intervals for each quantity
   maxsig_10 <- max(sqrt(var_CEP_10_II_low),
                    sqrt(var_CEP_10_II_up))
-  cstar_10 <- uniroot(f_cstar, c(1.64, 1.96), low = CEP_10_II_low,
-                      up = CEP_10_II_up, maxsig = maxsig_10)$root
+  cstar_10 <- stats:uniroot(f_cstar, c(1.64, 1.96), low = CEP_10_II_low,
+                            up = CEP_10_II_up, maxsig = maxsig_10)$root
   CEP_10_EUI_low <- CEP_10_II_low - cstar_10*sqrt(var_CEP_10_II_low)
   CEP_10_EUI_up <- CEP_10_II_up + cstar_10*sqrt(var_CEP_10_II_up)
 
   maxsig_00 <- max(sqrt(var_CEP_00_II_low),
                    sqrt(var_CEP_00_II_up))
-  cstar_00 <- uniroot(f_cstar, c(1.64, 1.96), low = CEP_00_II_low,
-                      up = CEP_00_II_up, maxsig = maxsig_00)$root
+  cstar_00 <- stats:uniroot(f_cstar, c(1.64, 1.96), low = CEP_00_II_low,
+                            up = CEP_00_II_up, maxsig = maxsig_00)$root
   CEP_00_EUI_low <- CEP_00_II_low - cstar_00*sqrt(var_CEP_00_II_low)
   CEP_00_EUI_up <- CEP_00_II_up + cstar_00*sqrt(var_CEP_00_II_up)
 
   maxsig_diff <- max(sqrt(var_CEP_diff_II_low),
                      sqrt(var_CEP_diff_II_up))
-  cstar_diff <- uniroot(f_cstar, c(1.64, 1.96), low = CEP_diff_II_low,
-                        up = CEP_diff_II_up, maxsig = maxsig_diff)$root
+  cstar_diff <- stats:uniroot(f_cstar, c(1.64,1.96), low = CEP_diff_II_low,
+                              up = CEP_diff_II_up,
+                              maxsig = maxsig_diff)$root
   CEP_diff_EUI_low <- CEP_diff_II_low-cstar_diff*sqrt(var_CEP_diff_II_low)
   CEP_diff_EUI_up <- CEP_diff_II_up + cstar_diff*sqrt(var_CEP_diff_II_up)
 
