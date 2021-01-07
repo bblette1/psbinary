@@ -16,7 +16,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
-    numderiv,
+    numDeriv,
     plyr,
     rootSolve,
     stats
