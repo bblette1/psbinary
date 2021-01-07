@@ -13,19 +13,30 @@ analyze_NEE(
 )
 }
 \arguments{
-\item{data}{data frame}
+\item{data}{Data frame containing the following variables
+\itemize{
+\item Z: indicator of treatment
+\item Y: indicator of outcome
+\item Y_tau: indicator of early outcome
+\item S_star: intermediate biomarker value
+\item R: indicator of measurement of intermediate
+}}
 
-\item{brange}{numeric vector}
+\item{brange}{Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_0}}}
 
-\item{design}{string}
+\item{design}{String describing the study design / sampling scheme used. This allows for estimation of sampling weights. Options include "full", "cc" (case-cohort), and "other". When "other" is chosen the weights argument must also be specified}
 
-\item{weights}{numeric vector}
+\item{weights}{Numeric (n x 1) vector containing pre-estimated sampling weights where n is the number of rows in \code{data}}
 
-\item{contrast}{string}
+\item{contrast}{Contrast function for estimand. Options include "logRR", "Difference", and "VE"}
 }
 \value{
-list
+Returns list consisting of 6 vectors corresponding to the ignorance intervals and EUIs of CEP(1, 0), CEP(0, 0), and the difference CEP(1, 0) - CEP(0, 0)
 }
 \description{
 Analyze data assuming no early treatment effects
+}
+\examples{
+analyze_NEE(mydataframe, c(-0.5, 0.5), design = "full", contrast = "VE")
+analyze_NEE(mydataframe, c(-1, 1), design = "other", weights = mydataframe$weights, contrast = "logRR")
 }
