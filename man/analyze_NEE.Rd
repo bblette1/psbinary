@@ -19,7 +19,7 @@ analyze_NEE(
 \item Y: indicator of outcome
 \item Y_tau: indicator of early outcome
 \item S_star: intermediate biomarker value
-\item R: indicator of measurement of intermediate
+\item R: indicator of measurement of intermediate biomarker
 }}
 
 \item{brange}{Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_0}}}
@@ -37,6 +37,11 @@ Returns list consisting of 6 vectors corresponding to the ignorance intervals an
 Analyze data assuming no early treatment effects
 }
 \examples{
-analyze_NEE(mydataframe, c(-0.5, 0.5), design = "full", contrast = "VE")
-analyze_NEE(mydataframe, c(-1, 1), design = "other", weights = mydataframe$weights, contrast = "logRR")
+Z <- rbinom(500, 1, 0.5)
+S_star <- rbinom(500, 1, 0.2)
+R <- rep(1, 500)
+Y_tau <- rep(0, 500)
+Y <- rbinom(500, 1, 0.1)
+df <- data.frame(Z, S_star, R, Y_tau, Y)
+analyze_NEE(df, c(-0.5, 0.5), design = "full", contrast = "VE")
 }
