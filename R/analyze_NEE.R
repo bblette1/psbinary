@@ -28,14 +28,6 @@
 analyze_NEE <- function(data, brange = c(0, 0), design = "full",
                         weights = NULL, contrast = "logRR") {
 
-  # Contrast function
-  h <- function(x, y) {
-    func <- log(x) - log(y)
-    if (contrast=="Difference") { func <- x - y }
-    if (contrast=="VE") { func <- 1 - x/y }
-    return(func)
-  }
-
   # Attach data
   data$S_star[is.na(data$S_star)] <- 0
   Z <- data$Z
@@ -106,42 +98,42 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   risk_0_10_second <- (risk_0 - risk_0_00_second*p_00) / p_10
 
   # Calculate CEP(1,0) ignorance interval
-  CEP_10_II_low <- min(h(risk_1_10, risk_0_10_first),
-                       h(risk_1_10, risk_0_10_second))
-  CEP_10_II_up <- max(h(risk_1_10, risk_0_10_first),
-                      h(risk_1_10, risk_0_10_second))
-  whichmin_10 <- which.min(c(h(risk_1_10, risk_0_10_first),
-                             h(risk_1_10, risk_0_10_second)))
-  whichmax_10 <- which.max(c(h(risk_1_10, risk_0_10_first),
-                             h(risk_1_10, risk_0_10_second)))
+  CEP_10_II_low <- min(h(risk_1_10, risk_0_10_first, contrast),
+                       h(risk_1_10, risk_0_10_second, contrast))
+  CEP_10_II_up <- max(h(risk_1_10, risk_0_10_first, contrast),
+                      h(risk_1_10, risk_0_10_second, contrast))
+  whichmin_10 <- which.min(c(h(risk_1_10, risk_0_10_first, contrast),
+                             h(risk_1_10, risk_0_10_second, contrast)))
+  whichmax_10 <- which.max(c(h(risk_1_10, risk_0_10_first, contrast),
+                             h(risk_1_10, risk_0_10_second, contrast)))
 
   # Calculate CEP(0,0) ignorance interval
-  CEP_00_II_low <- min(h(risk_1_00, risk_0_00_first),
-                       h(risk_1_00, risk_0_00_second))
-  CEP_00_II_up <- max(h(risk_1_00, risk_0_00_first),
-                      h(risk_1_00, risk_0_00_second))
-  whichmin_00 <- which.min(c(h(risk_1_00, risk_0_00_first),
-                             h(risk_1_00, risk_0_00_second)))
-  whichmax_00 <- which.max(c(h(risk_1_00, risk_0_00_first),
-                             h(risk_1_00, risk_0_00_second)))
+  CEP_00_II_low <- min(h(risk_1_00, risk_0_00_first, contrast),
+                       h(risk_1_00, risk_0_00_second, contrast))
+  CEP_00_II_up <- max(h(risk_1_00, risk_0_00_first, contrast),
+                      h(risk_1_00, risk_0_00_second, contrast))
+  whichmin_00 <- which.min(c(h(risk_1_00, risk_0_00_first, contrast),
+                             h(risk_1_00, risk_0_00_second, contrast)))
+  whichmax_00 <- which.max(c(h(risk_1_00, risk_0_00_first, contrast),
+                             h(risk_1_00, risk_0_00_second, contrast)))
 
   # Calculate CEP(1,0) - CEP(0,0) ignorance interval
-  CEP_diff_II_low <- min(h(risk_1_10, risk_0_10_first) -
-                           h(risk_1_00, risk_0_00_first),
-                         h(risk_1_10, risk_0_10_second) -
-                           h(risk_1_00, risk_0_00_second))
-  CEP_diff_II_up <- max(h(risk_1_10, risk_0_10_first) -
-                          h(risk_1_00, risk_0_00_first),
-                        h(risk_1_10, risk_0_10_second) -
-                          h(risk_1_00, risk_0_00_second))
-  whichmin_diff <- which.min(c(h(risk_1_10, risk_0_10_first) -
-                                 h(risk_1_00, risk_0_00_first),
-                               h(risk_1_10, risk_0_10_second) -
-                                 h(risk_1_00, risk_0_00_second)))
-  whichmax_diff <- which.max(c(h(risk_1_10, risk_0_10_first) -
-                                 h(risk_1_00, risk_0_00_first),
-                               h(risk_1_10, risk_0_10_second) -
-                                 h(risk_1_00, risk_0_00_second)))
+  CEP_diff_II_low <- min(h(risk_1_10, risk_0_10_first, contrast) -
+                           h(risk_1_00, risk_0_00_first, contrast),
+                         h(risk_1_10, risk_0_10_second, contrast) -
+                           h(risk_1_00, risk_0_00_second, contrast))
+  CEP_diff_II_up <- max(h(risk_1_10, risk_0_10_first, contrast) -
+                          h(risk_1_00, risk_0_00_first, contrast),
+                        h(risk_1_10, risk_0_10_second, contrast) -
+                          h(risk_1_00, risk_0_00_second, contrast))
+  whichmin_diff <- which.min(c(h(risk_1_10, risk_0_10_first, contrast) -
+                                 h(risk_1_00, risk_0_00_first, contrast),
+                               h(risk_1_10, risk_0_10_second, contrast) -
+                                 h(risk_1_00, risk_0_00_second, contrast)))
+  whichmax_diff <- which.max(c(h(risk_1_10, risk_0_10_first, contrast) -
+                                 h(risk_1_00, risk_0_00_first, contrast),
+                               h(risk_1_10, risk_0_10_second, contrast) -
+                                 h(risk_1_00, risk_0_00_second, contrast)))
 
 
 
