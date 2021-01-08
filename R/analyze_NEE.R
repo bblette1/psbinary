@@ -16,6 +16,8 @@
 #' @param contrast Contrast function for estimand. Options include "logRR", "Difference", and "VE"
 #'
 #' @return Returns list consisting of 6 vectors corresponding to the ignorance intervals and EUIs of CEP(1, 0), CEP(0, 0), and the difference CEP(1, 0) - CEP(0, 0)
+#' @importFrom stats uniroot
+#' @importFrom stats pnorm
 #' @export
 #'
 #' @examples Z <- rbinom(500, 1, 0.5)
@@ -160,9 +162,13 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
                                                 f = data_wide$Group)),
                            numDeriv_options = list(method = 'simple'),
                            theta = thetahat, beta0range = brange,
-                           contrast, design, whichmin_00, whichmax_00,
-                           whichmin_10, whichmax_10, whichmin_diff,
-                           whichmax_diff)
+                           contrast = contrast, design = design,
+                           whichmin_00 = whichmin_00,
+                           whichmax_00 = whichmax_00,
+                           whichmin_10 = whichmin_10,
+                           whichmax_10 = whichmax_10,
+                           whichmin_diff = whichmin_diff,
+                           whichmax_diff = whichmax_diff)
 
   A <- apply(simplify2array(Map(`*`, mats$A_i,
                                 data_wide$freq)), 1:2, sum)

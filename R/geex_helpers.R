@@ -31,10 +31,6 @@ compute_matrices <- function(geex_list,
                              numDeriv_options = list(method = 'Richardson'),
                              silent = TRUE,
                              ...){
-  # Warnings
-  if('bias' %in% corrections & is.null(correction_options$b)){
-    stop('b argument must be present if using bias correction')
-  }
 
   correct_bias <- any(c('bias') %in% corrections)
   correct_df   <- any(c('df') %in% corrections)
