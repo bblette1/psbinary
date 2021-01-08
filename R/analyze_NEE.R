@@ -148,11 +148,6 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   #source("No Early Effects/low_eefun_NEE.R")
   #source("No Early Effects/up_eefun_NEE.R")
 
-  # Define helper function for Imbens-Manski interval computation
-  f_cstar <- function(c, low, up, maxsig) {
-    pnorm(c + (up - low) / maxsig) - pnorm(-c) - 0.95
-  }
-
   # Get point estimates needed for sandwich variance estimation
   # and choose appropriate stack of estimating equations
   thetahat <- as.numeric(c(risk_0, risk_1_10, p_00, risk_1_00,
