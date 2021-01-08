@@ -236,3 +236,13 @@ estimate_equations <- function(eeFUN,
 
   list(parameters = theta_hat, vcov = Sigma_hat)
 }
+
+# Check an array object
+check_array <- function(object){
+  if(!is.array(object)){
+    stopifnot(is.numeric(object))
+    array(object, dim = c(1, 1, length(object)))
+  } else {
+    object
+  }
+}
