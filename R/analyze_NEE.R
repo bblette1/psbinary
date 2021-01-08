@@ -16,6 +16,10 @@
 #' @param contrast Contrast function for estimand. Options include "logRR", "Difference", and "VE"
 #'
 #' @return Returns list consisting of 6 vectors corresponding to the ignorance intervals and EUIs of CEP(1, 0), CEP(0, 0), and the difference CEP(1, 0) - CEP(0, 0)
+#' @import numDeriv
+#' @import plyr
+#' @import rootSolve
+#' @import stats
 #' @export
 #'
 #' @examples Z <- rbinom(500, 1, 0.5)
