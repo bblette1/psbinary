@@ -41,10 +41,10 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   if (tolower(design) == "full") {
     W <- rep(1, n)
   }
+  # estimate probability control has S_star observed: P(R = 1 | Y = 0)
+  solve_pi <- function(x) { sum((1 - Y)*(R - x)) }
+  pi_hat <- uniroot(solve_pi, c(0, 1))$root
   if (tolower(design) == "cc") {
-    # estimate probability control has S_star observed: P(R = 1 | Y = 0)
-    solve_pi <- function(x) { sum((1 - Y)*(R - x)) }
-    pi_hat <- uniroot(solve_pi, c(0, 1))$root
     W <- 1 / pi_hat*(1 - Y)*R + Y
   }
   if (!is.null(weights)) {
@@ -140,28 +140,13 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
 
   # Variance estimation
 
-  # Source M-estimation helper functions
-  #source("compute.R")
-  #source("utilities.R")
-
-  # Source files with estimating equations
-  #source("No Early Effects/low_eefun_NEE.R")
-  #source("No Early Effects/up_eefun_NEE.R")
-
-  # Get point estimates needed for sandwich variance estimation
-  # and choose appropriate stack of estimating equations
+  # Get point estimate vector needed for sandwich variance estimation
   thetahat <- as.numeric(c(risk_0, risk_1_10, p_00, risk_1_00,
                            risk_0_00_first, risk_0_10_first,
                            risk_0_00_second, risk_0_10_second,
                            CEP_00_II_low, CEP_00_II_up, CEP_10_II_low,
-                           CEP_10_II_up, CEP_diff_II_low, CEP_diff_II_up))
-
-  eefun <- eefun_NEE
-
-  if (tolower(design) == "cc") {
-    thetahat <- c(thetahat, pi_hat)
-    eefun <- eefun_NEE_cc
-  }
+                           CEP_10_II_up, CEP_diff_II_low, CEP_diff_II_up,
+                           pi_hat))
 
   # Convert data to wide form
   data$W <- W
@@ -170,12 +155,12 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
 
   # Calculate variance estimate for the lower bound of the ignorance
   # intervals using 'geex' package source code
-  mats <- compute_matrices(list(eeFUN = eefun,
+  mats <- compute_matrices(list(eeFUN = eefun_NEE,
                                 splitdt = split(data_wide,
                                                 f = data_wide$Group)),
                            numDeriv_options = list(method = 'simple'),
                            theta = thetahat, beta0range = brange,
-                           contrast, whichmin_00, whichmax_00,
+                           contrast, design, whichmin_00, whichmax_00,
                            whichmin_10, whichmax_10, whichmin_diff,
                            whichmax_diff)
 
@@ -190,32 +175,9 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   var_CEP_00_II_low <- Sigma[9, 9]
   var_CEP_10_II_low <- Sigma[11, 11]
   var_CEP_diff_II_low <- Sigma[13, 13]
-
-
-  # Same process for upper bound
-  if (min(brange) == max(brange)) {
-    var_CEP_00_II_up <- var_CEP_00_II_low
-    var_CEP_10_II_up <- var_CEP_10_II_low
-    var_CEP_diff_II_up <- var_CEP_diff_II_low
-  } else {
-    mats <-
-      compute_matrices(list(eeFUN = up_fun,
-                            splitdt = split(data_wide,
-                                            f = data_wide$Group)),
-                       numDeriv_options = list(method = 'simple'),
-                       theta = thetahat_up, beta0range = brange,
-                       contrast = contrast)
-
-    A <- apply(simplify2array(Map(`*`, mats$A_i,
-                                  data_wide$freq)), 1:2, sum)
-    B <- apply(simplify2array(Map(`*`, mats$B_i,
-                                  data_wide$freq)), 1:2, sum)
-    Sigma <- solve(A) %*% B %*% t(solve(A))
-
-    var_CEP_00_II_up <- Sigma[10, 10]
-    var_CEP_10_II_up <- Sigma[12, 12]
-    var_CEP_diff_II_up <- Sigma[14, 14]
-  } # end of 'else'
+  var_CEP_00_II_up <- Sigma[10, 10]
+  var_CEP_10_II_up <- Sigma[12, 12]
+  var_CEP_diff_II_up <- Sigma[14, 14]
 
   # compute Imbens-Manski intervals for each quantity
   maxsig_10 <- max(sqrt(var_CEP_10_II_low),
