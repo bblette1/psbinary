@@ -11,7 +11,7 @@ Description: This package implements the methods described in Gilbert et al.
     (2020): Post-randomization biomarker effect modification in an HIV
     vaccine clinical trial. Methods are implemented under three assumption
     sets as described in the paper: No early effects (NEE), no early benefit
-    (NEB), and no early harm (NEH)
+    (NEB), and no early harm (NEH).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
