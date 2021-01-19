@@ -27,9 +27,9 @@ eefun_NEB <- function(data, beta0range, beta1range, contrast, design,
            # P(Y(0) = 1 | Ytau(0) = 0) = theta[6]
            (1-Z)*(1-Y_tau)*(Y-theta[6]),
            # p_10 = theta[7]
-           (1-Y_tau)*Z*(1*(!is.na(S_star) & S_star==1)-theta[9])*
+           (1-Y_tau)*Z*(1*(!is.na(S_star) & S_star==1)-theta[7])*
              (design != "cc") +
-             (1-Y_tau)*Z*(1*(!is.na(S_star) & S_star==1)-theta[9])*
+             (1-Y_tau)*Z*(1*(!is.na(S_star) & S_star==1)-theta[7])*
              (1/theta[26]*(1-Y)*R+Y)*(design == "cc"),
 
            # Partially identifiable terms
