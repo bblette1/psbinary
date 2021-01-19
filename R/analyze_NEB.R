@@ -1,5 +1,6 @@
 analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
-                        design = "full", weights = NULL, contrast = "logRR") {
+                        design = "full", weights = NULL,
+                        contrast = "logRR") {
 
   # Attach data
   data$S_star[is.na(data$S_star)] <- 0
@@ -14,10 +15,10 @@ analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
   if (tolower(design) == "full") {
     W <- rep(1, n)
   }
+  # Estimate probability control has S_star observed: P(R = 1 | Y = 0)
+  solve_pi <- function(x) { sum((1 - Y)*(R - x)) }
+  pi_hat <- uniroot(solve_pi, c(0, 1))$root
   if (tolower(design) == "cc") {
-    # estimate probability control has S_star observed: P(R = 1 | Y = 0)
-    solve_pi <- function(x) { sum((1 - Y)*(R - x)) }
-    pi_hat <- uniroot(solve_pi, c(0, 1))$root
     W <- 1 / pi_hat*(1 - Y)*R + Y
   }
   if (!is.null(weights)) {
@@ -100,98 +101,108 @@ analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
   risk_0_10_fourth <- (risk_0_second - risk_0_00_fourth*p_00) / p_10
 
   # Calculate CEP(1,0) ignorance interval
-  CEP_10_II_low <- min(h(risk_1_10, risk_0_10_first),
-                       h(risk_1_10, risk_0_10_second),
-                       h(risk_1_10, risk_0_10_third),
-                       h(risk_1_10, risk_0_10_fourth))
-  CEP_10_II_up <- max(h(risk_1_10, risk_0_10_first),
-                      h(risk_1_10, risk_0_10_second),
-                      h(risk_1_10, risk_0_10_third),
-                      h(risk_1_10, risk_0_10_fourth))
+  CEP_10_II_low <- min(h(risk_1_10, risk_0_10_first, contrast),
+                       h(risk_1_10, risk_0_10_second, contrast),
+                       h(risk_1_10, risk_0_10_third, contrast),
+                       h(risk_1_10, risk_0_10_fourth, contrast))
+  CEP_10_II_up <- max(h(risk_1_10, risk_0_10_first, contrast),
+                      h(risk_1_10, risk_0_10_second, contrast),
+                      h(risk_1_10, risk_0_10_third, contrast),
+                      h(risk_1_10, risk_0_10_fourth, contrast))
+  whichmin_10 <- which.min(c(h(risk_1_10, risk_0_10_first, contrast),
+                             h(risk_1_10, risk_0_10_second, contrast),
+                             h(risk_1_10, risk_0_10_third, contrast),
+                             h(risk_1_10, risk_0_10_fourth, contrast)))
+  whichmax_10 <- which.max(c(h(risk_1_10, risk_0_10_first, contrast),
+                             h(risk_1_10, risk_0_10_second, contrast),
+                             h(risk_1_10, risk_0_10_third, contrast),
+                             h(risk_1_10, risk_0_10_fourth, contrast)))
 
   # Calculate CEP(0,0) ignorance interval
-  CEP_00_II_low <- min(h(risk_1_00, risk_0_00_first),
-                       h(risk_1_00, risk_0_00_second),
-                       h(risk_1_00, risk_0_00_third),
-                       h(risk_1_00, risk_0_00_fourth))
-  CEP_00_II_up <- max(h(risk_1_00, risk_0_00_first),
-                      h(risk_1_00, risk_0_00_second),
-                      h(risk_1_00, risk_0_00_third),
-                      h(risk_1_00, risk_0_00_fourth))
+  CEP_00_II_low <- min(h(risk_1_00, risk_0_00_first, contrast),
+                       h(risk_1_00, risk_0_00_second, contrast),
+                       h(risk_1_00, risk_0_00_third, contrast),
+                       h(risk_1_00, risk_0_00_fourth, contrast))
+  CEP_00_II_up <- max(h(risk_1_00, risk_0_00_first, contrast),
+                      h(risk_1_00, risk_0_00_second, contrast),
+                      h(risk_1_00, risk_0_00_third, contrast),
+                      h(risk_1_00, risk_0_00_fourth, contrast))
+  whichmin_00 <- which.min(c(h(risk_1_00, risk_0_00_first, contrast),
+                             h(risk_1_00, risk_0_00_second, contrast),
+                             h(risk_1_00, risk_0_00_third, contrast),
+                             h(risk_1_00, risk_0_00_fourth, contrast)))
+  whichmax_00 <- which.max(c(h(risk_1_00, risk_0_00_first, contrast),
+                             h(risk_1_00, risk_0_00_second, contrast),
+                             h(risk_1_00, risk_0_00_third, contrast),
+                             h(risk_1_00, risk_0_00_fourth, contrast)))
 
   # Calculate CEP(1,0) - CEP(0,0) ignorance interval
-  CEP_diff_II_low <- min(h(risk_1_10, risk_0_10_first) -
-                           h(risk_1_00, risk_0_00_first),
-                         h(risk_1_10, risk_0_10_second) -
-                           h(risk_1_00, risk_0_00_second),
-                         h(risk_1_10, risk_0_10_third) -
-                           h(risk_1_00, risk_0_00_third),
-                         h(risk_1_10, risk_0_10_fourth) -
-                           h(risk_1_00, risk_0_00_fourth))
-  CEP_diff_II_up <- max(h(risk_1_10, risk_0_10_first) -
-                          h(risk_1_00, risk_0_00_first),
-                        h(risk_1_10, risk_0_10_second) -
-                          h(risk_1_00, risk_0_00_second),
-                        h(risk_1_10, risk_0_10_third) -
-                          h(risk_1_00, risk_0_00_third),
-                        h(risk_1_10, risk_0_10_fourth) -
-                          h(risk_1_00, risk_0_00_fourth))
+  CEP_diff_II_low <- min(h(risk_1_10, risk_0_10_first, contrast) -
+                           h(risk_1_00, risk_0_00_first, contrast),
+                         h(risk_1_10, risk_0_10_second, contrast) -
+                           h(risk_1_00, risk_0_00_second, contrast),
+                         h(risk_1_10, risk_0_10_third, contrast) -
+                           h(risk_1_00, risk_0_00_third, contrast),
+                         h(risk_1_10, risk_0_10_fourth, contrast) -
+                           h(risk_1_00, risk_0_00_fourth, contrast))
+  CEP_diff_II_up <- max(h(risk_1_10, risk_0_10_first, contrast) -
+                          h(risk_1_00, risk_0_00_first, contrast),
+                        h(risk_1_10, risk_0_10_second, contrast) -
+                          h(risk_1_00, risk_0_00_second, contrast),
+                        h(risk_1_10, risk_0_10_third, contrast) -
+                          h(risk_1_00, risk_0_00_third, contrast),
+                        h(risk_1_10, risk_0_10_fourth, contrast) -
+                          h(risk_1_00, risk_0_00_fourth, contrast))
+  whichmin_diff <- which.min(c(h(risk_1_10, risk_0_10_first, contrast) -
+                                 h(risk_1_00, risk_0_00_first, contrast),
+                               h(risk_1_10, risk_0_10_second, contrast) -
+                                 h(risk_1_00, risk_0_00_second, contrast),
+                               h(risk_1_10, risk_0_10_third, contrast) -
+                                 h(risk_1_00, risk_0_00_third, contrast),
+                               h(risk_1_10, risk_0_10_fourth, contrast) -
+                                 h(risk_1_00, risk_0_00_fourth, contrast)))
+  whichmax_diff <- which.max(c(h(risk_1_10, risk_0_10_first, contrast) -
+                                 h(risk_1_00, risk_0_00_first, contrast),
+                               h(risk_1_10, risk_0_10_second, contrast) -
+                                 h(risk_1_00, risk_0_00_second, contrast),
+                               h(risk_1_10, risk_0_10_third, contrast) -
+                                 h(risk_1_00, risk_0_00_third, contrast),
+                               h(risk_1_10, risk_0_10_fourth, contrast) -
+                                 h(risk_1_00, risk_0_00_fourth, contrast)))
 
 
 
   # Variance estimation
 
-  # Source M-estimation helper functions
-  source("compute.R")
-  source("utilities.R")
-
-  # Source files with estimating equations
-  source("low_eefun_NEB.R")
-  source("up_eefun_NEB.R")
-
-  # Define helper function for Imbens-Manski interval computation
-  f_cstar <- function(c, low, up, maxsig) {
-    pnorm(c + (up - low) / maxsig) - pnorm(-c) - 0.95
-  }
-
-  # Get point estimates needed for sandwich variance estimation
-  # and choose appropriate stack of estimating equations
-  thetahat_low <-
-    as.numeric(c(risk_1_00, risk_1_10, mix_1, mix_2, mix, prob,
-                 risk_0_first, risk_new_first, p_10, risk_0_00_first,
-                 risk_0_10_first, CEP_00_II_low, CEP_10_II_low,
-                 CEP_diff_II_low))
-  thetahat_up <-
-    as.numeric(c(risk_1_00, risk_1_10, mix_1, mix_2, mix, prob,
-                 risk_0_second, risk_new_second, p_10, risk_0_00_second,
-                 risk_0_10_second, CEP_00_II_up, CEP_10_II_up,
-                 CEP_diff_II_up))
-
-  low_fun <- low_eefun
-  up_fun <- up_eefun
-
-  if (tolower(design) == "cc") {
-    thetahat_low <- c(thetahat_low, pi_hat)
-    thetahat_up <- c(thetahat_up, pi_hat)
-    low_fun <- low_eefun_cc
-    up_fun <- up_eefun_cc
-  }
+  # Get point estimate vector needed for sandwich variance estimation
+  thetahat <- as.numeric(c(risk_1_00, risk_1_10, mix_1, mix_2, mix, prob,
+                           p_10, risk_0_first, risk_new_first,
+                           risk_0_00_first, risk_0_10_first,
+                           risk_0_second, risk_new_second,
+                           risk_0_00_second, risk_0_10_second,
+                           CEP_00_II_low, CEP_00_II_up, CEP_10_II_low,
+                           CEP_10_II_up, CEP_diff_II_low, CEP_diff_II_up,
+                           pi_hat))
 
   # Convert data to wide form
   data$W <- W
-  data_wide <- count(data, c('Y', 'Z', 'Y_tau', 'S_star', 'R', 'W'))
+  data_wide <- plyr::count(data, c('Y', 'Z', 'Y_tau', 'S_star', 'R', 'W'))
   data_wide$Group <- 1:nrow(data_wide)
 
-  # Calculate variance estimate for the lower bound of the ignorance
-  # intervals using 'geex' package source code
-  mats <-
-    compute_matrices(list(eeFUN = low_fun,
-                          splitdt = split(data_wide,
-                                          f = data_wide$Group)),
-                     numDeriv_options = list(method = 'simple'),
-                     theta = thetahat_low,
-                     beta0range = brange0, beta1range = brange1,
-                     contrast = contrast)
+  # Calculate variance estimate for the ignorance intervals using
+  # 'geex' package source code
+  mats <- compute_matrices(list(eeFUN = eefun_NEE,
+                                splitdt = split(data_wide,
+                                                f = data_wide$Group)),
+                           numDeriv_options = list(method = 'simple'),
+                           theta = thetahat, beta0range = brange,
+                           contrast = contrast, design = design,
+                           whichmin_00 = whichmin_00,
+                           whichmax_00 = whichmax_00,
+                           whichmin_10 = whichmin_10,
+                           whichmax_10 = whichmax_10,
+                           whichmin_diff = whichmin_diff,
+                           whichmax_diff = whichmax_diff)
 
   A <- apply(simplify2array(Map(`*`, mats$A_i,
                                 data_wide$freq)), 1:2, sum)
@@ -201,36 +212,12 @@ analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
   Sigma <- solve(A) %*% B %*% t(solve(A))
 
   # Extract variances of interest from sandwich matrix
-  var_CEP_00_II_low <- Sigma[7, 7]
-  var_CEP_10_II_low <- Sigma[8, 8]
-  var_CEP_diff_II_low <- Sigma[9, 9]
-
-
-  # Same process for upper bound
-  if (min(brange) == max(brange)) {
-    var_CEP_00_II_up <- var_CEP_00_II_low
-    var_CEP_10_II_up <- var_CEP_10_II_low
-    var_CEP_diff_II_up <- var_CEP_diff_II_low
-  } else {
-    mats <-
-      compute_matrices(list(eeFUN = up_fun,
-                            splitdt = split(data_wide,
-                                            f = data_wide$Group)),
-                       numDeriv_options = list(method = 'simple'),
-                       theta = thetahat_up,
-                       beta0range = brange0, beta1range = brange1,
-                       contrast = contrast)
-
-    A <- apply(simplify2array(Map(`*`, mats$A_i,
-                                  data_wide$freq)), 1:2, sum)
-    B <- apply(simplify2array(Map(`*`, mats$B_i,
-                                  data_wide$freq)), 1:2, sum)
-    Sigma <- solve(A) %*% B %*% t(solve(A))
-
-    var_CEP_00_II_up <- Sigma[7, 7]
-    var_CEP_10_II_up <- Sigma[8, 8]
-    var_CEP_diff_II_up <- Sigma[9, 9]
-  } # end of 'else'
+  var_CEP_00_II_low <- Sigma[9, 9]
+  var_CEP_10_II_low <- Sigma[11, 11]
+  var_CEP_diff_II_low <- Sigma[13, 13]
+  var_CEP_00_II_up <- Sigma[10, 10]
+  var_CEP_10_II_up <- Sigma[12, 12]
+  var_CEP_diff_II_up <- Sigma[14, 14]
 
   # compute Imbens-Manski intervals for each quantity
   maxsig_10 <- max(sqrt(var_CEP_10_II_low),
@@ -249,8 +236,9 @@ analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
 
   maxsig_diff <- max(sqrt(var_CEP_diff_II_low),
                      sqrt(var_CEP_diff_II_up))
-  cstar_diff <- uniroot(f_cstar, c(1.64, 1.96), low = CEP_diff_II_low,
-                        up = CEP_diff_II_up, maxsig = maxsig_diff)$root
+  cstar_diff <- uniroot(f_cstar, c(1.64,1.96), low = CEP_diff_II_low,
+                        up = CEP_diff_II_up,
+                        maxsig = maxsig_diff)$root
   CEP_diff_EUI_low <- CEP_diff_II_low-cstar_diff*sqrt(var_CEP_diff_II_low)
   CEP_diff_EUI_up <- CEP_diff_II_up + cstar_diff*sqrt(var_CEP_diff_II_up)
 
