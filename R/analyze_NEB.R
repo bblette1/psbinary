@@ -1,16 +1,33 @@
-#' Title
+#' Analyze under NEB assumptions
 #'
-#' @param data
-#' @param brange
-#' @param brange1
-#' @param design
-#' @param weights
-#' @param contrast
+#' Analyze data assuming no early treatment benefits
 #'
-#' @return
+#' @param data Data frame containing the following variables
+#' \itemize{
+#'    \item Z: indicator of treatment
+#'    \item Y: indicator of outcome
+#'    \item Y_tau: indicator of early outcome
+#'    \item S_star: intermediate biomarker value
+#'    \item R: indicator of measurement of intermediate biomarker
+#' }
+#' @param brange Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_0}}
+#' @param brange1 Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_1}}
+#' @param design String describing the study design / sampling scheme used. This allows for estimation of sampling weights. Options include "full", "cc" (case-cohort), and "other". When "other" is chosen the weights argument must also be specified
+#' @param weights Numeric (n x 1) vector containing pre-estimated sampling weights where n is the number of rows in `data`
+#' @param contrast Contrast function for estimand. Options include "logRR", "Difference", and "VE"
+#'
+#' @return Returns list consisting of 6 vectors corresponding to the ignorance intervals and EUIs of CEP(1, 0), CEP(0, 0), and the difference CEP(1, 0) - CEP(0, 0)
+#' @importFrom stats uniroot
+#' @importFrom stats pnorm
 #' @export
 #'
-#' @examples
+#' @examples Z <- rbinom(500, 1, 0.5)
+#' S_star <- rbinom(500, 1, 0.2)
+#' R <- rep(1, 500)
+#' Y_tau <- rep(0, 500)
+#' Y <- rbinom(500, 1, 0.1)
+#' df <- data.frame(Z, S_star, R, Y_tau, Y)
+#' analyze_NEB(df, c(-0.5, 0.5), design = "full", contrast = "VE")
 analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
                         design = "full", weights = NULL,
                         contrast = "logRR") {
