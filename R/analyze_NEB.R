@@ -11,7 +11,7 @@
 #'    \item R: indicator of measurement of intermediate biomarker
 #' }
 #' @param brange Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_0}}
-#' @param brange1 Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_1}}
+#' @param brange1 Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>1</sub>}}{\eqn{\beta_1}}
 #' @param design String describing the study design / sampling scheme used. This allows for estimation of sampling weights. Options include "full", "cc" (case-cohort), and "other". When "other" is chosen the weights argument must also be specified
 #' @param weights Numeric (n x 1) vector containing pre-estimated sampling weights where n is the number of rows in `data`
 #' @param contrast Contrast function for estimand. Options include "logRR", "Difference", and "VE"
