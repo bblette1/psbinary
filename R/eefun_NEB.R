@@ -9,19 +9,28 @@ eefun_NEB <- function(data, beta0range, beta1range, contrast, design,
          c( # Identifiable terms
 
            # risk_1_00 = theta[1]
-           (1-Y_tau)*Z*1*(!is.na(S_star) & S_star==0)*(Y-theta[1]),
+           (1-Y_tau)*Z*(!is.na(S_star) & S_star==0)*(Y-theta[1])*
+             (design != "cc") +
+             (1-Y_tau)*Z*(!is.na(S_star) & S_star==0)*(Y-theta[1])*
+             (1/theta[26]*(1-Y)*R+Y)*(design == "cc"),
            # risk_1_10 = theta[2]
-           (1-Y_tau)*Z*1*(!is.na(S_star) & S_star==1)*(Y-theta[2]),
+           (1-Y_tau)*Z*(!is.na(S_star) & S_star==1)*(Y-theta[2])*
+             (design != "cc") +
+             (1-Y_tau)*Z*(!is.na(S_star) & S_star==1)*(Y-theta[2])*
+             (1/theta[26]*(1-Y)*R+Y)*(design == "cc"),
            # P(Ytau(1) = 0) = theta[3]
            Z*(1-Y_tau-theta[3]),
            # P(Ytau(0) = 0) = theta[4]
-           (1-Z)*(1-Yt_au-theta[4]),
+           (1-Z)*(1-Y_tau-theta[4]),
            # P(Ytau(1) = 0 | Ytau(0) = 0) = theta[5]
            theta[5] - theta[3]/theta[4],
            # P(Y(0) = 1 | Ytau(0) = 0) = theta[6]
            (1-Z)*(1-Y_tau)*(Y-theta[6]),
            # p_10 = theta[7]
-           (1-Ytau)*Z*(1*(!is.na(S_star) & S_star==1)-theta[9]),
+           (1-Ytau)*Z*(1*(!is.na(S_star) & S_star==1)-theta[9])*
+             (design != "cc") +
+             (1-Ytau)*Z*(1*(!is.na(S_star) & S_star==1)-theta[9])*
+             (1/theta[26]*(1-Y)*R+Y)*(design == "cc"),
 
            # Partially identifiable terms
 
@@ -60,95 +69,171 @@ eefun_NEB <- function(data, beta0range, beta1range, contrast, design,
            # CEP terms
 
            # Lower bound of CEP(0, 0) = theta[20]
-           ( theta[9] - (1- theta[4]/theta[5]) )*
+           ( theta[20] - (1- theta[1]/theta[12]) )*
              (contrast == "VE" & whichmin_00 == 1) +
-             ( theta[9] - (1- theta[4]/theta[7]) )*
+             ( theta[20] - (1- theta[1]/theta[14]) )*
              (contrast == "VE" & whichmin_00 == 2) +
-             ( theta[9] - (theta[4] - theta[5]) )*
+             ( theta[20] - (1- theta[1]/theta[16]) )*
+             (contrast == "VE" & whichmin_00 == 3) +
+             ( theta[20] - (1- theta[1]/theta[18]) )*
+             (contrast == "VE" & whichmin_00 == 4) +
+             ( theta[20] - (theta[1] - theta[12]) )*
              (contrast == "Difference" & whichmin_00 == 1) +
-             ( theta[9] - (theta[4] - theta[7]) )*
+             ( theta[20] - (theta[1] - theta[14]) )*
              (contrast == "Difference" & whichmin_00 == 2) +
-             ( theta[9] - (log(theta[4]) - log(theta[5])) )*
+             ( theta[20] - (theta[1] - theta[16]) )*
+             (contrast == "Difference" & whichmin_00 == 3) +
+             ( theta[20] - (theta[1] - theta[18]) )*
+             (contrast == "Difference" & whichmin_00 == 4) +
+             ( theta[20] - (log(theta[1]) - log(theta[12])) )*
              (contrast == "logRR" & whichmin_00 == 1) +
-             ( theta[9] - (log(theta[4]) - log(theta[7])) )*
-             (contrast == "logRR" & whichmin_00 == 2),
+             ( theta[20] - (log(theta[1]) - log(theta[14])) )*
+             (contrast == "logRR" & whichmin_00 == 2) +
+             ( theta[20] - (log(theta[1]) - log(theta[16])) )*
+             (contrast == "logRR" & whichmin_00 == 3) +
+             ( theta[20] - (log(theta[1]) - log(theta[18])) )*
+             (contrast == "logRR" & whichmin_00 == 4),
 
            # Upper bound of CEP(0, 0) = theta[21]
-           ( theta[10] - (1- theta[4]/theta[5]) )*
+           ( theta[21] - (1- theta[1]/theta[12]) )*
              (contrast == "VE" & whichmax_00 == 1) +
-             ( theta[10] - (1- theta[4]/theta[7]) )*
+             ( theta[21] - (1- theta[1]/theta[14]) )*
              (contrast == "VE" & whichmax_00 == 2) +
-             ( theta[10] - (theta[4] - theta[5]) )*
+             ( theta[21] - (1- theta[1]/theta[16]) )*
+             (contrast == "VE" & whichmax_00 == 3) +
+             ( theta[21] - (1- theta[1]/theta[18]) )*
+             (contrast == "VE" & whichmax_00 == 4) +
+             ( theta[21] - (theta[1] - theta[12]) )*
              (contrast == "Difference" & whichmax_00 == 1) +
-             ( theta[10] - (theta[4] - theta[7]) )*
+             ( theta[21] - (theta[1] - theta[14]) )*
              (contrast == "Difference" & whichmax_00 == 2) +
-             ( theta[10] - (log(theta[4]) - log(theta[5])) )*
+             ( theta[21] - (theta[1] - theta[16]) )*
+             (contrast == "Difference" & whichmax_00 == 3) +
+             ( theta[21] - (theta[1] - theta[18]) )*
+             (contrast == "Difference" & whichmax_00 == 4) +
+             ( theta[21] - (log(theta[1]) - log(theta[12])) )*
              (contrast == "logRR" & whichmax_00 == 1) +
-             ( theta[10] - (log(theta[4]) - log(theta[7])) )*
-             (contrast == "logRR" & whichmax_00 == 2),
+             ( theta[21] - (log(theta[1]) - log(theta[14])) )*
+             (contrast == "logRR" & whichmax_00 == 2) +
+             ( theta[21] - (log(theta[1]) - log(theta[16])) )*
+             (contrast == "logRR" & whichmax_00 == 3) +
+             ( theta[21] - (log(theta[1]) - log(theta[18])) )*
+             (contrast == "logRR" & whichmax_00 == 4),
 
            # Lower bound of CEP(1, 0) = theta[22]
-           ( theta[11] - (1- theta[2]/theta[6]) )*
+           ( theta[22] - (1- theta[2]/theta[13]) )*
              (contrast == "VE" & whichmin_10 == 1) +
-             ( theta[11] - (1- theta[2]/theta[8]) )*
+             ( theta[22] - (1- theta[2]/theta[15]) )*
              (contrast == "VE" & whichmin_10 == 2) +
-             ( theta[11] - (theta[2] - theta[6]) )*
+             ( theta[22] - (1- theta[2]/theta[17]) )*
+             (contrast == "VE" & whichmin_10 == 3) +
+             ( theta[22] - (1- theta[2]/theta[19]) )*
+             (contrast == "VE" & whichmin_10 == 4) +
+             ( theta[22] - (theta[2] - theta[13]) )*
              (contrast == "Difference" & whichmin_10 == 1) +
-             ( theta[11] - (theta[2] - theta[8]) )*
+             ( theta[22] - (theta[2] - theta[15]) )*
              (contrast == "Difference" & whichmin_10 == 2) +
-             ( theta[11] - (log(theta[2]) - log(theta[6])) )*
+             ( theta[22] - (theta[2] - theta[17]) )*
+             (contrast == "Difference" & whichmin_10 == 3) +
+             ( theta[22] - (theta[2] - theta[19]) )*
+             (contrast == "Difference" & whichmin_10 == 4) +
+             ( theta[22] - (log(theta[2]) - log(theta[13])) )*
              (contrast == "logRR" & whichmin_10 == 1) +
-             ( theta[11] - (log(theta[2]) - log(theta[8])) )*
-             (contrast == "logRR" & whichmin_10 == 2),
+             ( theta[22] - (log(theta[2]) - log(theta[15])) )*
+             (contrast == "logRR" & whichmin_10 == 2) +
+             ( theta[22] - (log(theta[2]) - log(theta[17])) )*
+             (contrast == "logRR" & whichmin_10 == 3) +
+             ( theta[22] - (log(theta[2]) - log(theta[19])) )*
+             (contrast == "logRR" & whichmin_10 == 4),
 
            # Upper bound of CEP(1, 0) = theta[23]
-           ( theta[12] - (1- theta[2]/theta[6]) )*
+           ( theta[23] - (1- theta[2]/theta[13]) )*
              (contrast == "VE" & whichmax_10 == 1) +
-             ( theta[12] - (1- theta[2]/theta[8]) )*
+             ( theta[23] - (1- theta[2]/theta[15]) )*
              (contrast == "VE" & whichmax_10 == 2) +
-             ( theta[12] - (theta[2] - theta[6]) )*
+             ( theta[23] - (1- theta[2]/theta[17]) )*
+             (contrast == "VE" & whichmax_10 == 3) +
+             ( theta[23] - (1- theta[2]/theta[19]) )*
+             (contrast == "VE" & whichmax_10 == 4) +
+             ( theta[23] - (theta[2] - theta[13]) )*
              (contrast == "Difference" & whichmax_10 == 1) +
-             ( theta[12] - (theta[2] - theta[8]) )*
+             ( theta[23] - (theta[2] - theta[15]) )*
              (contrast == "Difference" & whichmax_10 == 2) +
-             ( theta[12] - (log(theta[2]) - log(theta[6])) )*
+             ( theta[23] - (theta[2] - theta[17]) )*
+             (contrast == "Difference" & whichmax_10 == 3) +
+             ( theta[23] - (theta[2] - theta[19]) )*
+             (contrast == "Difference" & whichmax_10 == 4) +
+             ( theta[23] - (log(theta[2]) - log(theta[13])) )*
              (contrast == "logRR" & whichmax_10 == 1) +
-             ( theta[12] - (log(theta[2]) - log(theta[8])) )*
-             (contrast == "logRR" & whichmax_10 == 2),
+             ( theta[23] - (log(theta[2]) - log(theta[15])) )*
+             (contrast == "logRR" & whichmax_10 == 2) +
+             ( theta[23] - (log(theta[2]) - log(theta[17])) )*
+             (contrast == "logRR" & whichmax_10 == 3) +
+             ( theta[23] - (log(theta[2]) - log(theta[19])) )*
+             (contrast == "logRR" & whichmax_10 == 4),
 
            # Lower bound of CEP(1, 0) - CEP(0, 0) = theta[24]
-           ( theta[13] - (1-theta[2]/theta[6]) +(1-theta[4]/theta[5]) )*
+           ( theta[24] - (1-theta[2]/theta[13])+(1-theta[1]/theta[12]) )*
              (contrast == "VE" & whichmin_diff == 1) +
-             ( theta[13] - (1-theta[2]/theta[8]) +(1-theta[4]/theta[7]) )*
+             ( theta[24] - (1-theta[2]/theta[15])+(1-theta[1]/theta[14]) )*
              (contrast == "VE" & whichmin_diff == 2) +
-             ( theta[13] - (theta[2]-theta[6]) + (theta[4]-theta[5]) )*
+             ( theta[24] - (1-theta[2]/theta[17])+(1-theta[1]/theta[16]) )*
+             (contrast == "VE" & whichmin_diff == 3) +
+             ( theta[24] - (1-theta[2]/theta[19])+(1-theta[1]/theta[18]) )*
+             (contrast == "VE" & whichmin_diff == 4) +
+             ( theta[24] - (theta[2]-theta[13]) + (theta[1]-theta[12]) )*
              (contrast == "Difference" & whichmin_diff == 1) +
-             ( theta[13] - (theta[2]-theta[8]) + (theta[4]-theta[7]) )*
+             ( theta[24] - (theta[2]-theta[15]) + (theta[1]-theta[14]) )*
              (contrast == "Difference" & whichmin_diff == 2) +
-             ( theta[13] - (log(theta[2]) - log(theta[6])) +
-                 (log(theta[4]) - log(theta[5])) )*
+             ( theta[24] - (theta[2]-theta[17]) + (theta[1]-theta[16]) )*
+             (contrast == "Difference" & whichmin_diff == 3) +
+             ( theta[24] - (theta[2]-theta[19]) + (theta[1]-theta[18]) )*
+             (contrast == "Difference" & whichmin_diff == 4) +
+             ( theta[24] - (log(theta[2]) - log(theta[13])) +
+                 (log(theta[1]) - log(theta[12])) )*
              (contrast == "logRR" & whichmin_diff == 1) +
-             ( theta[13] - (log(theta[2]) - log(theta[8])) +
-                 (log(theta[4]) - log(theta[7])) )*
-             (contrast == "logRR" & whichmin_diff == 2),
+             ( theta[24] - (log(theta[2]) - log(theta[15])) +
+                 (log(theta[1]) - log(theta[14])) )*
+             (contrast == "logRR" & whichmin_diff == 2) +
+             ( theta[24] - (log(theta[2]) - log(theta[17])) +
+                 (log(theta[1]) - log(theta[16])) )*
+             (contrast == "logRR" & whichmin_diff == 3) +
+             ( theta[24] - (log(theta[2]) - log(theta[19])) +
+                 (log(theta[1]) - log(theta[18])) )*
+             (contrast == "logRR" & whichmin_diff == 4),
 
            # Upper bound of CEP(1, 0) - CEP(0, 0) = theta[25]
-           ( theta[14] - (1-theta[2]/theta[6]) +(1-theta[4]/theta[5]) )*
+           ( theta[25] - (1-theta[2]/theta[13])+(1-theta[1]/theta[12]) )*
              (contrast == "VE" & whichmax_diff == 1) +
-             ( theta[14] - (1-theta[2]/theta[8]) +(1-theta[4]/theta[7]) )*
+             ( theta[25] - (1-theta[2]/theta[15])+(1-theta[1]/theta[14]) )*
              (contrast == "VE" & whichmax_diff == 2) +
-             ( theta[14] - (theta[2]-theta[6]) + (theta[4]-theta[5]) )*
+             ( theta[25] - (1-theta[2]/theta[17])+(1-theta[1]/theta[16]) )*
+             (contrast == "VE" & whichmax_diff == 3) +
+             ( theta[25] - (1-theta[2]/theta[19])+(1-theta[1]/theta[18]) )*
+             (contrast == "VE" & whichmax_diff == 4) +
+             ( theta[25] - (theta[2]-theta[13]) + (theta[1]-theta[12]) )*
              (contrast == "Difference" & whichmax_diff == 1) +
-             ( theta[14] - (theta[2]-theta[8]) + (theta[4]-theta[7]) )*
+             ( theta[25] - (theta[2]-theta[15]) + (theta[1]-theta[14]) )*
              (contrast == "Difference" & whichmax_diff == 2) +
-             ( theta[14] - (log(theta[2]) - log(theta[6])) +
-                 (log(theta[4]) - log(theta[5])) )*
+             ( theta[25] - (theta[2]-theta[17]) + (theta[1]-theta[16]) )*
+             (contrast == "Difference" & whichmax_diff == 3) +
+             ( theta[25] - (theta[2]-theta[19]) + (theta[1]-theta[18]) )*
+             (contrast == "Difference" & whichmax_diff == 4) +
+             ( theta[25] - (log(theta[2]) - log(theta[13])) +
+                 (log(theta[1]) - log(theta[12])) )*
              (contrast == "logRR" & whichmax_diff == 1) +
-             ( theta[14] - (log(theta[2]) - log(theta[8])) +
-                 (log(theta[4]) - log(theta[7])) )*
-             (contrast == "logRR" & whichmax_diff == 2),
+             ( theta[25] - (log(theta[2]) - log(theta[15])) +
+                 (log(theta[1]) - log(theta[14])) )*
+             (contrast == "logRR" & whichmax_diff == 2) +
+             ( theta[25] - (log(theta[2]) - log(theta[17])) +
+                 (log(theta[1]) - log(theta[16])) )*
+             (contrast == "logRR" & whichmax_diff == 3) +
+             ( theta[25] - (log(theta[2]) - log(theta[19])) +
+                 (log(theta[1]) - log(theta[18])) )*
+             (contrast == "logRR" & whichmax_diff == 4),
 
            # Case-cohort weights, pi = theta[26]
-           (1-Y)*(R-theta[15])
+           (1-Y)*(R-theta[26])
          ))
   }
 

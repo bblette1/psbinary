@@ -1,3 +1,16 @@
+#' Title
+#'
+#' @param data
+#' @param brange
+#' @param brange1
+#' @param design
+#' @param weights
+#' @param contrast
+#'
+#' @return
+#' @export
+#'
+#' @examples
 analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
                         design = "full", weights = NULL,
                         contrast = "logRR") {
@@ -86,18 +99,18 @@ analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
   risk_0_00_second <- uniroot(solve_risk_0_00_maxmin, c(0, 1))$root
   risk_0_10_second <- (risk_0_first - risk_0_00_second*p_00) / p_10
 
-  solve_risk_0_00_maxmax <- function(x) {
-    risk_0_10 <- 1 / ( 1 + exp(max(brange1))*(1-x) / x )
-    risk_0_second - x*p_00 - risk_0_10*p_10
-  }
-  risk_0_00_third <- uniroot(solve_risk_0_00_maxmax, c(0, 1))$root
-  risk_0_10_third <- (risk_0_second - risk_0_00_third*p_00) / p_10
-
   solve_risk_0_00_minmax <- function(x) {
     risk_0_10 <- 1 / ( 1 + exp(min(brange1))*(1-x) / x )
     risk_0_second - x*p_00 - risk_0_10*p_10
   }
-  risk_0_00_fourth <- uniroot(solve_risk_0_00_minmax, c(0, 1))$root
+  risk_0_00_third <- uniroot(solve_risk_0_00_minmax, c(0, 1))$root
+  risk_0_10_third <- (risk_0_second - risk_0_00_third*p_00) / p_10
+
+  solve_risk_0_00_maxmax <- function(x) {
+    risk_0_10 <- 1 / ( 1 + exp(max(brange1))*(1-x) / x )
+    risk_0_second - x*p_00 - risk_0_10*p_10
+  }
+  risk_0_00_fourth <- uniroot(solve_risk_0_00_maxmax, c(0, 1))$root
   risk_0_10_fourth <- (risk_0_second - risk_0_00_fourth*p_00) / p_10
 
   # Calculate CEP(1,0) ignorance interval
@@ -193,11 +206,12 @@ analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
 
   # Calculate variance estimate for the ignorance intervals using
   # 'geex' package source code
-  mats <- compute_matrices(list(eeFUN = eefun_NEE,
+  mats <- compute_matrices(list(eeFUN = eefun_NEB,
                                 splitdt = split(data_wide,
                                                 f = data_wide$Group)),
                            numDeriv_options = list(method = 'simple'),
-                           theta = thetahat, beta0range = brange,
+                           theta = thetahat,
+                           beta0range = brange, beta1range = brange1,
                            contrast = contrast, design = design,
                            whichmin_00 = whichmin_00,
                            whichmax_00 = whichmax_00,
@@ -214,12 +228,12 @@ analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
   Sigma <- solve(A) %*% B %*% t(solve(A))
 
   # Extract variances of interest from sandwich matrix
-  var_CEP_00_II_low <- Sigma[9, 9]
-  var_CEP_10_II_low <- Sigma[11, 11]
-  var_CEP_diff_II_low <- Sigma[13, 13]
-  var_CEP_00_II_up <- Sigma[10, 10]
-  var_CEP_10_II_up <- Sigma[12, 12]
-  var_CEP_diff_II_up <- Sigma[14, 14]
+  var_CEP_00_II_low <- Sigma[20, 20]
+  var_CEP_00_II_up  <- Sigma[21, 21]
+  var_CEP_10_II_low <- Sigma[22, 22]
+  var_CEP_10_II_up  <- Sigma[23, 23]
+  var_CEP_diff_II_low <- Sigma[24, 24]
+  var_CEP_diff_II_up  <- Sigma[25, 25]
 
   # compute Imbens-Manski intervals for each quantity
   maxsig_10 <- max(sqrt(var_CEP_10_II_low),
