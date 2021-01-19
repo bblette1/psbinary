@@ -179,10 +179,10 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
 
   # Extract variances of interest from sandwich matrix
   var_CEP_00_II_low <- Sigma[9, 9]
-  var_CEP_10_II_low <- Sigma[11, 11]
-  var_CEP_diff_II_low <- Sigma[13, 13]
   var_CEP_00_II_up <- Sigma[10, 10]
+  var_CEP_10_II_low <- Sigma[11, 11]
   var_CEP_10_II_up <- Sigma[12, 12]
+  var_CEP_diff_II_low <- Sigma[13, 13]
   var_CEP_diff_II_up <- Sigma[14, 14]
 
   # compute Imbens-Manski intervals for each quantity
