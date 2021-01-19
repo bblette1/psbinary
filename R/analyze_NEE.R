@@ -43,7 +43,7 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   if (tolower(design) == "full") {
     W <- rep(1, n)
   }
-  # estimate probability control has S_star observed: P(R = 1 | Y = 0)
+  # Estimate probability control has S_star observed: P(R = 1 | Y = 0)
   solve_pi <- function(x) { sum((1 - Y)*(R - x)) }
   pi_hat <- uniroot(solve_pi, c(0, 1))$root
   if (tolower(design) == "cc") {
@@ -155,8 +155,8 @@ analyze_NEE <- function(data, brange = c(0, 0), design = "full",
   data_wide <- plyr::count(data, c('Y', 'Z', 'Y_tau', 'S_star', 'R', 'W'))
   data_wide$Group <- 1:nrow(data_wide)
 
-  # Calculate variance estimate for the lower bound of the ignorance
-  # intervals using 'geex' package source code
+  # Calculate variance estimates for the ignorance intervals using
+  # 'geex' package source code
   mats <- compute_matrices(list(eeFUN = eefun_NEE,
                                 splitdt = split(data_wide,
                                                 f = data_wide$Group)),
