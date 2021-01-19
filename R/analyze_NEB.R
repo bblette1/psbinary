@@ -10,7 +10,7 @@
 #'    \item S_star: intermediate biomarker value
 #'    \item R: indicator of measurement of intermediate biomarker
 #' }
-#' @param brange Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_0}}
+#' @param brange0 Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_0}}
 #' @param brange1 Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>1</sub>}}{\eqn{\beta_1}}
 #' @param design String describing the study design / sampling scheme used. This allows for estimation of sampling weights. Options include "full", "cc" (case-cohort), and "other". When "other" is chosen the weights argument must also be specified
 #' @param weights Numeric (n x 1) vector containing pre-estimated sampling weights where n is the number of rows in `data`
@@ -28,7 +28,7 @@
 #' Y <- rbinom(500, 1, 0.1)
 #' df <- data.frame(Z, S_star, R, Y_tau, Y)
 #' analyze_NEB(df, c(-0.5, 0.5), design = "full", contrast = "VE")
-analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
+analyze_NEB <- function(data, brange0 = c(0, 0), brange1 = c(0, 0),
                         design = "full", weights = NULL,
                         contrast = "logRR") {
 
@@ -228,7 +228,7 @@ analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
                                                 f = data_wide$Group)),
                            numDeriv_options = list(method = 'simple'),
                            theta = thetahat,
-                           beta0range = brange, beta1range = brange1,
+                           beta0range = brange0, beta1range = brange1,
                            contrast = contrast, design = design,
                            whichmin_00 = whichmin_00,
                            whichmax_00 = whichmax_00,
