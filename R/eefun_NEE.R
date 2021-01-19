@@ -1,8 +1,5 @@
 # Estimating equation vector for ignorance interval lower bound under NEE
 # Used for M estimation variance calculation
-
-# Full-cohort estimating equations
-# Also for user inputted weights (gives conservative variance estimate)
 eefun_NEE <- function(data, beta0range, contrast, design, whichmin_00,
                       whichmax_00, whichmin_10, whichmax_10,
                       whichmin_diff, whichmax_diff) {
