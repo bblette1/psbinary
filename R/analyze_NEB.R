@@ -177,9 +177,11 @@ analyze_NEB <- function(data, brange = c(0, 0), brange1 = c(0, 0),
   # Get point estimate vector needed for sandwich variance estimation
   thetahat <- as.numeric(c(risk_1_00, risk_1_10, mix_1, mix_2, mix, prob,
                            p_10, risk_0_first, risk_new_first,
-                           risk_0_00_first, risk_0_10_first,
                            risk_0_second, risk_new_second,
+                           risk_0_00_first, risk_0_10_first,
                            risk_0_00_second, risk_0_10_second,
+                           risk_0_00_third, risk_0_10_third,
+                           risk_0_00_fourth, risk_0_10_fourth,
                            CEP_00_II_low, CEP_00_II_up, CEP_10_II_low,
                            CEP_10_II_up, CEP_diff_II_low, CEP_diff_II_up,
                            pi_hat))
