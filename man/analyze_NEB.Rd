@@ -6,7 +6,7 @@
 \usage{
 analyze_NEB(
   data,
-  brange = c(0, 0),
+  brange0 = c(0, 0),
   brange1 = c(0, 0),
   design = "full",
   weights = NULL,
@@ -23,7 +23,7 @@ analyze_NEB(
 \item R: indicator of measurement of intermediate biomarker
 }}
 
-\item{brange}{Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_0}}}
+\item{brange0}{Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_0}}}
 
 \item{brange1}{Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>1</sub>}}{\eqn{\beta_1}}}
 
