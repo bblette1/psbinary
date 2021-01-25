@@ -1,4 +1,4 @@
-# Estimating equation vector for ignorance interval lower bound under NEE
+# Estimating equation vector for ignorance interval under NEE
 # Used for M estimation variance calculation
 eefun_NEE <- function(data, beta0range, contrast, design, whichmin_00,
                       whichmax_00, whichmin_10, whichmax_10,
