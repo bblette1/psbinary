@@ -2,5 +2,6 @@
 
 export(analyze_NEB)
 export(analyze_NEE)
+export(analyze_NEH)
 importFrom(stats,pnorm)
 importFrom(stats,uniroot)

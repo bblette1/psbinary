@@ -1,3 +1,37 @@
+#' Analyze under NEH assumptions
+#'
+#' Analyze data assuming no early treatment harm
+#'
+#' @param data Data frame containing the following variables
+#' \itemize{
+#'    \item Z: indicator of treatment
+#'    \item Y: indicator of outcome
+#'    \item Y_tau: indicator of early outcome
+#'    \item S_star: intermediate biomarker value
+#'    \item R: indicator of measurement of intermediate biomarker
+#' }
+#' @param brange0 Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>0</sub>}}{\eqn{\beta_0}}
+#' @param brange1 Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>1</sub>}}{\eqn{\beta_1}}
+#' @param brange2 Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>2</sub>}}{\eqn{\beta_2}}
+#' @param brange3 Numeric (2 x 1) vector containing the specified lower and upper bounds of the range for sensitivity parameter \ifelse{html}{\out{&#946;<sub>3</sub>}}{\eqn{\beta_3}}
+#' @param design String describing the study design / sampling scheme used. This allows for estimation of sampling weights. Options include "full", "cc" (case-cohort), and "other". When "other" is chosen the weights argument must also be specified
+#' @param weights Numeric (n x 1) vector containing pre-estimated sampling weights where n is the number of rows in `data`
+#' @param contrast Contrast function for estimand. Options include "logRR", "Difference", and "VE"
+#'
+#' @return Returns list consisting of 6 vectors corresponding to the ignorance intervals and EUIs of CEP(1, 0), CEP(0, 0), and the difference CEP(1, 0) - CEP(0, 0)
+#' @importFrom stats uniroot
+#' @importFrom stats pnorm
+#' @export
+#'
+#' @examples Z <- rbinom(500, 1, 0.5)
+#' S_star <- rbinom(500, 1, 0.2)
+#' R <- rep(1, 500)
+#' Y_tau_1 <- rbinom(500, 1, 0.02)
+#' Y_tau_0 <- Y_tau_1 + rbinom(500, 1, (1-Y_tau_1)*Z*0.02)
+#' Y_tau <- Y_tau_0*(1-Z) + Y_tau_1*Z
+#' Y <- rbinom(500, 1, 0.1)
+#' df <- data.frame(Z, S_star, R, Y_tau, Y)
+#' analyze_NEB(df, c(-0.5, 0.5), design = "full", contrast = "VE")
 analyze_NEH <- function(data, brange0 = c(0, 0), brange1 = c(0, 0),
                           brange2 = c(0, 0), brange3 = c(0, 0),
                           design = "full", weights = NULL,
@@ -419,7 +453,7 @@ analyze_NEH <- function(data, brange0 = c(0, 0), brange1 = c(0, 0),
 
   # Convert data to wide form
   data$W <- W
-  data_wide <- count(data, c('Y', 'Z', 'Y_tau', 'S_star', 'R', 'W'))
+  data_wide <- plyr::count(data, c('Y', 'Z', 'Y_tau', 'S_star', 'R', 'W'))
   data_wide$Group <- 1:nrow(data_wide)
 
   # Calculate variance estimate for the lower bound of the ignorance
