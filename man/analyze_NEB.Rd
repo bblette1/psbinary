@@ -46,7 +46,7 @@ R <- rep(1, 500)
 Y_tau_0 <- rbinom(500, 1, 0.02)
 Y_tau_1 <- Y_tau_0 + rbinom(500, 1, (1-Y_tau_0)*Z*0.02)
 Y_tau <- Y_tau_0*(1-Z) + Y_tau_1*Z
-Y <- rbinom(500, 1, 0.1)
+Y <- Y_tau + (1 - Y_tau)*rbinom(500, 1, 0.1)
 df <- data.frame(Z, S_star, R, Y_tau, Y)
 analyze_NEB(df, c(-0.5, 0.5), design = "full", contrast = "VE")
 }
