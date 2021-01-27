@@ -31,7 +31,7 @@
 #' Y_tau <- Y_tau_0*(1-Z) + Y_tau_1*Z
 #' Y <- rbinom(500, 1, 0.1)
 #' df <- data.frame(Z, S_star, R, Y_tau, Y)
-#' analyze_NEB(df, c(-0.5, 0.5), design = "full", contrast = "VE")
+#' analyze_NEH(df, c(-0.5, 0.5), design = "full", contrast = "VE")
 analyze_NEH <- function(data, brange0 = c(0, 0), brange1 = c(0, 0),
                           brange2 = c(0, 0), brange3 = c(0, 0),
                           design = "full", weights = NULL,
