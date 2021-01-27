@@ -29,7 +29,7 @@
 #' Y_tau_1 <- rbinom(500, 1, 0.02)
 #' Y_tau_0 <- Y_tau_1 + rbinom(500, 1, (1-Y_tau_1)*Z*0.02)
 #' Y_tau <- Y_tau_0*(1-Z) + Y_tau_1*Z
-#' Y <- rbinom(500, 1, 0.1)
+#' Y <- Y_tau + (1 - Y_tau)*rbinom(500, 1, 0.1)
 #' df <- data.frame(Z, S_star, R, Y_tau, Y)
 #' analyze_NEH(df, c(-0.5, 0.5), design = "full", contrast = "VE")
 analyze_NEH <- function(data, brange0 = c(0, 0), brange1 = c(0, 0),
@@ -83,7 +83,7 @@ analyze_NEH <- function(data, brange0 = c(0, 0), brange1 = c(0, 0),
   p_1 <- uniroot(solve_p1, c(0, 1))$root
 
   solve_v <- function(x) { sum(x*(1 - Y_tau)*Z - (1 - Y_tau)*(1 - Z)) }
-  vhat <- uniroot(solve_v, c(0, 1))$root
+  vhat <- uniroot(solve_v, c(0, 10))$root
 
   # Then SACE method
   solve_p10_min <- function(x) {
