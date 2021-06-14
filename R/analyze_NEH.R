@@ -181,10 +181,11 @@ analyze_NEH <- function(data, brange0 = c(0, 0), brange1 = c(0, 0),
   # First get some helper intermediate terms
   solve_row2 <- function(x) { sum((1 - Y_tau)*Z*S_star*W*(Y - x)) }
   row2 <- uniroot(solve_row2, c(0, 1))$root
-  solve_helper_prob <- function(x) { sum(Z*(S_star*(1 - Y_tau)*W - x)) }
+  solve_helper_prob <- function(x) { sum(Z*(1 - Y_tau)*W*(S_star - x)) }
   helper_prob <- uniroot(solve_helper_prob, c(0, 1))$root
-  r1_10_mix_first <- p_10_first*Ytau_prob / helper_prob
-  r1_10_mix_second <- p_10_second*Ytau_prob / helper_prob
+  Ytau_prob1 <- 1 - mean(Y_tau[Z == 1])
+  r1_10_mix_first <- p_10_first*Ytau_prob / (p_1*Ytau_prob1)
+  r1_10_mix_second <- p_10_second*Ytau_prob / (p_1*Ytau_prob1)
 
   # Then SACE method
   solve_risk_1_10_minmin <- function(x) {

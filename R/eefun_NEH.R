@@ -95,15 +95,12 @@ eefun_NEH <- function(data, beta0range, beta1range, beta2range, beta3range,
              (design != "cc") +
              Z*(1-Y_tau)*(!is.na(S_star) & S_star==1)*W*(Y-theta[29])*
              (1/theta[47]*(1-Y)*R+Y)*(design == "cc"),
-           # helper_prob = theta[30]
-           ((1-Y_tau)*(!is.na(S_star) & S_star==1)*Z*W - Z*theta[30])*
-             (design != "cc") +
-             ((1-Y_tau)*(!is.na(S_star) & S_star==1)*Z*W - Z*theta[30])*
-             (1/theta[47]*(1-Y)*R+Y)*(design == "cc"),
+           # Ytau_prob1 = theta[30]
+           Z*(1-Y_tau-theta[30]),
            # r_10_mix_first = theta[31]
-           theta[4]*theta[19] - theta[31]*theta[30],
+           theta[4]*theta[19] - theta[31]*theta[30]*theta[3],
            # r_10_mix_second = theta[32]
-           theta[6]*theta[20] - theta[32]*theta[30],
+           theta[6]*theta[20] - theta[32]*theta[30]*theta[3],
 
            # risk_1_10_first = theta[33]
            theta[29] - theta[33]*theta[31] - theta[34]*(1-theta[31]),
